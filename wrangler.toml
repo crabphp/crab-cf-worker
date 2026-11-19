@@ -6,7 +6,7 @@ compatibility_date = "2026-11-19"
 command = "sh scripts/bundle.sh"
 watch_dir = ["runtime/dist"]
 
-# The free plan's CPU limit, enforced on a paid account too: a request that uses more than 10 ms fails,
-# so this Worker proves it runs on the free plan.
+# The free plan's CPU limit, set on a paid account. Cloudflare did not enforce it strictly: on
+# 2026-11-19 requests using up to 135 ms still succeeded, so passing here does not prove the free plan works.
 [limits]
 cpu_ms = 10

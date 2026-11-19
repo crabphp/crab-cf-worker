@@ -17,6 +17,11 @@ export const cases = [
   }],
   ['POST', '/api/orders', 409, { product_id: 4, quantity: 1, email: 'a@b.co' }],
   ['GET', '/up', 200],
+  ['GET', '/debug', 200, null, body => { assert.match(body, /64-bit/); assert.match(body, /mbstring/); }],
+  ['GET', '/debug/phpinfo', 200, null, body => assert.match(body, /PHP Version/)],
+  ['GET', '/raw', 200, null, body => assert.match(body, /Hermit Mug/)],
+  ['GET', '/raw/api/products', 200, null, body => assert.equal(JSON.parse(body).data.length, 5)],
+  ['GET', '/raw/nope', 404],
 ];
 
 export async function acceptance(fetcher) {

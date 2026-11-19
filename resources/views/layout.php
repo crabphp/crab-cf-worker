@@ -20,7 +20,7 @@
 <body>
     <header>
         <a href="/">Crab on Workers</a>
-        <span class="muted"><a href="/api/products">/api/products</a></span>
+        <span class="muted"><a href="/api/products">/api/products</a> · <a href="/debug">/debug</a></span>
     </header>
     <main><?= $body ?></main>
 </body>

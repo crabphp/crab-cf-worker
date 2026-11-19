@@ -1,0 +1,17 @@
+{
+  "wasmBytes": {
+    "old": 11505886,
+    "minimalSource": 8399409,
+    "compactExperiment": 8906571,
+    "opcacheExperiment": 10679729,
+    "snapshotSelected": 13119958
+  },
+  "oldAppZipBytes": 916249,
+  "wranglerDryRunUpload": {
+    "oldUncompressedKiB": 13575.35,
+    "oldGzipKiB": 3813.30,
+    "newUncompressedKiB": 12988.91,
+    "newGzipKiB": 3470.13
+  },
+  "note": "Source/compact/OPcache sizes are the artifacts used for their recorded experiments; only the selected final snapshot is shipped. Total Upload is Wrangler's dry-run result, not a live deploy. Cloudflare's current upload limit is 64 MiB uncompressed."
+}

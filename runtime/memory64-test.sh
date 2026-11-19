@@ -6,13 +6,13 @@ set -eu
 root=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
 dir=$(mktemp -d "$root/runtime/.memory64-XXXXXX")
 trap 'rm -rf "$dir"' EXIT INT TERM
-# (module (memory (export "memory") i64 1)
+# (module (table i64 1 funcref) (memory (export "memory") i64 1)
 #   (func (export "probe") (result i64) i64.const 9007199254740991))
 python3 - "$dir/probe.wasm" <<'PY'
 import sys
 from pathlib import Path
 Path(sys.argv[1]).write_bytes(bytes.fromhex(
- '0061736d01000000' '0105016000017e' '03020100' '0503010401'
+ '0061736d01000000' '0105016000017e' '03020100' '040401700401' '0503010401'
  '071202066d656d6f727902000570726f62650000'
  '0a0d010b0042ffffffffffffff0f0b'))
 PY
@@ -22,7 +22,7 @@ export default { fetch() {
   try {
     const { exports } = new WebAssembly.Instance(module);
     const value = exports.probe();
-    return Response.json({ memory64: value === 9007199254740991n, value: String(value), bytes: exports.memory.buffer.byteLength });
+    return Response.json({ memory64: value === 9007199254740991n, table64: true, value: String(value), bytes: exports.memory.buffer.byteLength });
   } catch (error) { return Response.json({ memory64: false, error: String(error) }, {status: 500}); }
 }};
 JS

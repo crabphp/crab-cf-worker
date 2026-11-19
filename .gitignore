@@ -1,7 +1,6 @@
 /vendor/
 /node_modules/
-/dist/*
-!/dist/app.zip
+/dist/
 /storage/
 /.wrangler/
 .dev.vars

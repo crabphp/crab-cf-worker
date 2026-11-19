@@ -6,6 +6,9 @@
 #include <stdlib.h>
 #include <spawn.h>
 #include <ucontext.h>
+#include <grp.h>
+
+int initgroups(const char *user, gid_t group) { errno = ENOSYS; return -1; }
 
 int getdtablesize(void) { return 1024; }
 int posix_spawnp(pid_t *pid, const char *file, const posix_spawn_file_actions_t *actions,

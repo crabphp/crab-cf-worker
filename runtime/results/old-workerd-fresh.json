@@ -1,0 +1,145 @@
+{
+  "kind": "old",
+  "engine": "workerd",
+  "freshWorker": true,
+  "clock": "performance.now (elapsed)",
+  "node": "v22.22.2",
+  "runs": 5,
+  "date": "2026-11-19T11:20:39.780Z",
+  "medians": [
+    {
+      "path": "/",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 279,
+      "request1": 26,
+      "request10": 2,
+      "cold": 343,
+      "total": 397,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 278,
+      "request1": 22,
+      "request10": 1,
+      "cold": 337,
+      "total": 391,
+      "memoryBytes": 67108864
+    }
+  ],
+  "rows": [
+    {
+      "path": "/",
+      "instantiate": 54,
+      "phpBoot": 38,
+      "appBoot": 279,
+      "request1": 26,
+      "request10": 2,
+      "cold": 343,
+      "total": 397,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/",
+      "instantiate": 55,
+      "phpBoot": 37,
+      "appBoot": 286,
+      "request1": 26,
+      "request10": 2,
+      "cold": 349,
+      "total": 404,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 273,
+      "request1": 26,
+      "request10": 2,
+      "cold": 336,
+      "total": 390,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 274,
+      "request1": 26,
+      "request10": 1,
+      "cold": 337,
+      "total": 391,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 286,
+      "request1": 26,
+      "request10": 1,
+      "cold": 349,
+      "total": 403,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 282,
+      "request1": 23,
+      "request10": 1,
+      "cold": 342,
+      "total": 396,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 276,
+      "request1": 22,
+      "request10": 0,
+      "cold": 335,
+      "total": 389,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 56,
+      "phpBoot": 44,
+      "appBoot": 293,
+      "request1": 22,
+      "request10": 3,
+      "cold": 359,
+      "total": 415,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 274,
+      "request1": 23,
+      "request10": 1,
+      "cold": 334,
+      "total": 388,
+      "memoryBytes": 67108864
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 54,
+      "phpBoot": 37,
+      "appBoot": 278,
+      "request1": 22,
+      "request10": 1,
+      "cold": 337,
+      "total": 391,
+      "memoryBytes": 67108864
+    }
+  ]
+}

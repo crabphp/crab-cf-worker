@@ -1,0 +1,143 @@
+{
+  "kind": "new",
+  "engine": "workerd",
+  "node": "v22.22.2",
+  "runs": 5,
+  "date": "2026-11-19T10:49:00.562Z",
+  "medians": [
+    {
+      "path": "/",
+      "instantiate": 52,
+      "phpBoot": 3,
+      "appBoot": 11,
+      "request1": 4,
+      "request10": 0,
+      "cold": 18,
+      "total": 68,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 46,
+      "phpBoot": 3,
+      "appBoot": 10,
+      "request1": 3,
+      "request10": 0,
+      "cold": 17,
+      "total": 65,
+      "memoryBytes": 33554432
+    }
+  ],
+  "rows": [
+    {
+      "path": "/",
+      "instantiate": 58,
+      "phpBoot": 21,
+      "appBoot": 40,
+      "request1": 8,
+      "request10": 0,
+      "cold": 69,
+      "total": 127,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/",
+      "instantiate": 52,
+      "phpBoot": 4,
+      "appBoot": 12,
+      "request1": 3,
+      "request10": 0,
+      "cold": 19,
+      "total": 71,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/",
+      "instantiate": 44,
+      "phpBoot": 3,
+      "appBoot": 11,
+      "request1": 4,
+      "request10": 0,
+      "cold": 18,
+      "total": 62,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/",
+      "instantiate": 52,
+      "phpBoot": 3,
+      "appBoot": 10,
+      "request1": 3,
+      "request10": 0,
+      "cold": 16,
+      "total": 68,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/",
+      "instantiate": 46,
+      "phpBoot": 3,
+      "appBoot": 10,
+      "request1": 4,
+      "request10": 0,
+      "cold": 17,
+      "total": 63,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 49,
+      "phpBoot": 3,
+      "appBoot": 10,
+      "request1": 4,
+      "request10": 0,
+      "cold": 17,
+      "total": 66,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 46,
+      "phpBoot": 4,
+      "appBoot": 10,
+      "request1": 3,
+      "request10": 0,
+      "cold": 17,
+      "total": 63,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 44,
+      "phpBoot": 3,
+      "appBoot": 10,
+      "request1": 3,
+      "request10": 0,
+      "cold": 16,
+      "total": 60,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 49,
+      "phpBoot": 4,
+      "appBoot": 10,
+      "request1": 3,
+      "request10": 0,
+      "cold": 17,
+      "total": 66,
+      "memoryBytes": 33554432
+    },
+    {
+      "path": "/api/products",
+      "instantiate": 46,
+      "phpBoot": 3,
+      "appBoot": 12,
+      "request1": 4,
+      "request10": 0,
+      "cold": 19,
+      "total": 65,
+      "memoryBytes": 33554432
+    }
+  ]
+}

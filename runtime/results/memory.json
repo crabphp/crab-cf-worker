@@ -1,0 +1,26 @@
+{
+  "requests": 1000,
+  "before": {
+    "usedSize": 1689352,
+    "totalSize": 4718592,
+    "embedderHeapUsedSize": 258112,
+    "backingStorageSize": 1716106
+  },
+  "after": {
+    "usedSize": 2910412,
+    "totalSize": 5505024,
+    "embedderHeapUsedSize": 902976,
+    "backingStorageSize": 1756082
+  },
+  "wasmLinearBytes": 33554432,
+  "largeBody": {
+    "usedSize": 2064156,
+    "totalSize": 5767168,
+    "embedderHeapUsedSize": 213488,
+    "backingStorageSize": 16382799,
+    "linearBytes": 48365568
+  },
+  "accountedBytes": 41718514,
+  "largeBodyAccountedBytes": 70729023,
+  "note": "Local workerd inspector, without forced GC. The inspector excludes Wasm linear memory; add the separately verified 32 MiB. Sum uses allocated JS heap capacity plus reported backing/embedder storage; compiled-code/platform overhead is not included. Not whole-process RSS or live isolate telemetry."
+}

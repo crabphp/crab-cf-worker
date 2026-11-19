@@ -20,9 +20,31 @@ export function bridge(php, times = {}) {
       const headers = [...request.headers];
       const chunks = [encoder.encode(request.method), encoder.encode(url.pathname + url.search), headers.length];
       for (const [name, value] of headers) chunks.push(encoder.encode(name), encoder.encode(value));
-      chunks.push(new Uint8Array(await request.arrayBuffer()));
-      const size = chunks.reduce((sum, chunk) => sum + 4 + (typeof chunk === 'number' ? 0 : chunk.length), 0);
-      if (size > MAX_REQUEST) return new Response('Request too large.\n', { status: 413 });
+      const overhead = chunks.reduce((sum, chunk) => sum + 4 + (typeof chunk === 'number' ? 0 : chunk.length), 4);
+      const tooLarge = () => new Response('Request too large.\n', { status: 413 });
+      if (overhead > MAX_REQUEST || Number(request.headers.get('content-length')) > MAX_REQUEST - overhead) {
+        await request.body?.cancel();
+        return tooLarge();
+      }
+      const bodyChunks = [];
+      let bodySize = 0;
+      if (request.body) {
+        const reader = request.body.getReader();
+        try {
+          while (true) {
+            const { value, done } = await reader.read();
+            if (done) break;
+            bodySize += value.length;
+            if (bodySize + overhead > MAX_REQUEST) { await reader.cancel(); return tooLarge(); }
+            bodyChunks.push(value);
+          }
+        } finally { reader.releaseLock(); }
+      }
+      const bodyBytes = new Uint8Array(bodySize);
+      let copied = 0;
+      for (const chunk of bodyChunks) { bodyBytes.set(chunk, copied); copied += chunk.length; }
+      chunks.push(bodyBytes);
+      const size = overhead + bodySize;
       const pointer = php._malloc(BigInt(size));
       if (!pointer) throw new Error('PHP allocation failed');
       try {

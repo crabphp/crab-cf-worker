@@ -1,0 +1,2 @@
+# Keep upstream license notices byte-for-byte, including their whitespace.
+runtime/dist/licenses/** -whitespace

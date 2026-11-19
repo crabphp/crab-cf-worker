@@ -1,0 +1,6 @@
+{
+  "method": "Two successive full build.sh runs with identical inputs, different container IDs; sha256sum -c passed for all three executable artifacts. PHP build-system labels, clock, timezone and build-time entropy are normalized.",
+  "php.wasm": "ef14c6b2de0133491d8fb2a6a551ad9625d6342f3d7b9b516ee7bef3766e5f99",
+  "php.mjs": "960e31f135d1ca18bdbe1865a880d4043136c1195ef61da228e250880b320f1f",
+  "startup.mjs": "3cae01c3c78c0c890bc944edffddcf5a1a39b0ed1f9c618ef86ff7a26675b567"
+}

@@ -8,6 +8,8 @@
 #include <string.h>
 #include <php_embed.h>
 #include <Zend/zend_exceptions.h>
+#include <ext/random/php_random.h>
+#include <ext/random/php_random_csprng.h>
 
 static unsigned char *answer;
 static size_t answer_size, answer_capacity;
@@ -68,6 +70,7 @@ int crab_boot(void) {
 int crab_request(const unsigned char *input, size_t length) {
     if (!booted || length > 8 * 1024 * 1024) return 1;
     answer_size = 0;
+    SG(global_request_time) = 0;
     int status = 1;
     zval args[4], name, value, function, result;
     for (int i = 0; i < 4; i++) ZVAL_UNDEF(&args[i]);
@@ -113,6 +116,18 @@ int crab_request(const unsigned char *input, size_t length) {
         zval_ptr_dtor(&name); zval_ptr_dtor(&value); zval_ptr_dtor(&function); zval_ptr_dtor(&result);
     } zend_catch { status = 1; } zend_end_try();
     return status;
+}
+
+/* Snapshot only after boot, before any real request. Never freeze a cached
+ * entropy descriptor, RNG seed, or wall-clock request timestamp. */
+void crab_prepare_snapshot(void) {
+    php_random_csprng_shutdown();
+    RANDOM_G(combined_lcg_seeded) = false;
+    RANDOM_G(mt19937_seeded) = false;
+    memset(&RANDOM_G(fallback_seed_state), 0, sizeof(RANDOM_G(fallback_seed_state)));
+    memset(&RANDOM_G(mt19937), 0, sizeof(RANDOM_G(mt19937)));
+    memset(&RANDOM_G(combined_lcg), 0, sizeof(RANDOM_G(combined_lcg)));
+    SG(global_request_time) = 0;
 }
 
 const unsigned char *crab_response(void) { return answer; }

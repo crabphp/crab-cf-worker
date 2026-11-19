@@ -1,0 +1,9 @@
+{
+  "workerd": "1.20261118.1",
+  "wrangler": "4.165.0",
+  "compatibilityDate": "2026-11-19",
+  "localProbe": { "memory64": true, "table64": true, "value": "9007199254740991", "bytes": 65536 },
+  "fullPhpRuntime": { "version": "8.4.27", "PHP_INT_SIZE": 8, "PHP_INT_MAX": "9223372036854775807", "unpatchedValidatorSafeBound": "9007199254740991", "acceptancePassed": true },
+  "node": "24.11.1 passes; Node 22.22.2 rejects the actual PHP module's table64 limits even with experimental memory64 enabled",
+  "liveProbe": "Not deployed. Run sh runtime/memory64-test.sh deploy against the separate crab-memory64-probe Worker."
+}

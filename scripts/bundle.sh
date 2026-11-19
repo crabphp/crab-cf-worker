@@ -3,6 +3,17 @@
 set -eu
 cd "$(dirname "$0")/.."
 
+# Cloudflare's build machines have no Composer, so dist/app.zip is built here and committed;
+# there, the committed bundle is used as it is.
+if ! command -v composer >/dev/null 2>&1; then
+    if [ -f dist/app.zip ]; then
+        echo "No Composer: using the committed dist/app.zip. Run npm run bundle locally after a change."
+        exit 0
+    fi
+    echo "No Composer and no dist/app.zip: build the bundle locally with npm run bundle." >&2
+    exit 1
+fi
+
 composer install --no-dev --optimize-autoloader --quiet
 
 # The PHP this Worker runs is 32-bit, so its integers stop at 2,147,483,647. The framework's

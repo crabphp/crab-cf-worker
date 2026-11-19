@@ -25,13 +25,19 @@ npm run dev        # http://127.0.0.1:8787
 
 `wrangler dev` and `wrangler deploy` run `scripts/bundle.sh` first, which installs the PHP dependencies and packs the application into `dist/app.zip`.
 
+`dist/app.zip` is committed, because Cloudflare's build machines have no Composer: there, `bundle.sh` uses the committed bundle as it is. **After changing the application, run `npm run bundle` and commit `dist/app.zip` with the change.**
+
 ## Deploy
+
+From this machine:
 
 ```sh
 npx wrangler login
 npm run deploy     # prints the *.workers.dev URL
 npx wrangler tail  # live logs
 ```
+
+Or from the Cloudflare dashboard, deploying on every push: **Workers & Pages → Create → Import a repository**, pick this repository, name the project `crab-cf-worker` (the `name` in `wrangler.toml`), leave the build command empty and keep the deploy command `npx wrangler deploy`.
 
 The free plan allows 10 ms of CPU a request, which PHP's first request in an isolate exceeds; use the Workers Paid plan.
 

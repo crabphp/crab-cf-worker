@@ -13,7 +13,7 @@ const rows = [];
 if (engine === 'node') {
   await writeFile('runtime/.cache/bench-node.mjs', `${importLine}\nimport { measure } from '../bench-case.mjs';\nconsole.log(JSON.stringify(await measure(create, process.argv[2])));\n`);
   for (const path of ['/', '/api/products']) for (let run = 0; run < runs; run++) {
-    const result = spawnSync(process.execPath, ['--experimental-wasm-memory64', '--no-warnings', '--loader', './runtime/node-loader.mjs', 'runtime/.cache/bench-node.mjs', path], { encoding: 'utf8' });
+    const result = spawnSync(process.execPath, ['--no-warnings', '--loader', './runtime/node-loader.mjs', 'runtime/.cache/bench-node.mjs', path], { encoding: 'utf8' });
     if (result.status) throw new Error(result.stderr + result.stdout);
     const row = JSON.parse(result.stdout.trim().split('\n').at(-1));
     rows.push(row); console.log(row);

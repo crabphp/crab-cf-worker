@@ -1,83 +1,77 @@
 # Crab on Cloudflare Workers
 
-An experiment: a [Crab](https://github.com/crabphp/framework) application inside a Cloudflare Worker, on PHP 8.4 compiled to WebAssembly ([php-cloud-wasm](https://www.npmjs.com/package/php-cloud-wasm)). It is a pretend shop: two HTML pages and a small JSON API over products kept in code.
+An experiment: a [Crab](https://github.com/crabphp/framework) shop inside a Cloudflare Worker, using our own minimal PHP 8.4.27 WebAssembly build. Products live in code; two HTML pages and a small JSON API exercise routing, templates, dependency injection and validation.
 
-> **This is only an experiment.** It is not supported, not maintained and not a way to run Crab in production. It exists to find out what works when Crab runs on PHP compiled to WebAssembly; the limits it found are listed below. Crab is built to run as its own long-lived server.
+> **Only an experiment.** Not supported or maintained, and not a production deployment model for Crab. Crab is designed for its own long-lived server.
 
-## Status
-
-| Route | Works |
-| --- | --- |
-| `GET /api/products` | Yes |
-| `GET /api/products/{id}` | Yes |
-| `POST /api/orders` | Yes, with validation |
-| `GET /up` | Yes |
-| `GET /`, `GET /products/{id}` | Yes, as plain PHP templates |
-
-Measured on Cloudflare with `wrangler tail`: a request that lands on a new isolate uses 0.5 to 1 s of CPU (starting PHP, unpacking and loading the application); one on a warm isolate uses about 3 ms. Most requests landed on new isolates.
-
-## Local runtime baseline
-
-`npm test` starts Wrangler, checks all ten shop/API cases, and stops it. The
-replacement-runtime task is in `runtime/BRIEF.md`. `runtime/memory64-test.sh`
-proves memory64 works in local workerd 1.20261118.1; `sh runtime/memory64-test.sh deploy`
-is an optional, separate live probe (not run automatically).
-
-Reproduce the old runtime baseline with `sh runtime/prepare-legacy.sh`, then
-`node runtime/bench.mjs old node` and `node runtime/bench.mjs old workerd`.
-Five fresh PHP instances per route; medians in milliseconds, on this Linux host:
-
-| Engine / route | Instantiate | PHP init | Unzip + app boot | First request | Tenth request | Boot + first |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: |
-| Node 22 / `/` | 58.1 | 40.4 | 269.7 | 80.1 | 1.86 | 391.4 |
-| Node 22 / `/api/products` | 57.9 | 40.4 | 314.4 | 76.2 | 1.29 | 429.3 |
-| workerd / `/` | 18 | 5 | 191 | 13 | 1 | 208 |
-| workerd / `/api/products` | 17 | 4 | 179 | 11 | <1 | 194 |
-
-Raw samples: `runtime/results/old-*.json`. Node uses a fresh process per sample;
-workerd reuses the compiled module but creates a fresh PHP instance. Local
-workerd timers have 1 ms resolution; these are elapsed times, not billing CPU.
-The first workerd sample (before V8 warms up) was 455 ms boot + first request.
-Do not measure this with the frozen clock on live Workers. The old Wasm is
-11,505,886 bytes; its app zip is 916,249 bytes; linear memory is 64 MiB.
-
-## Run
-
-Needs PHP 8.4 with Composer, Node 24, and `zip`.
+## Run and build
 
 ```sh
-npm install
-npm run dev        # http://127.0.0.1:8787
+npm ci
+npm run dev          # http://127.0.0.1:8787
+npm test             # starts Wrangler, checks all ten acceptance cases, stops it
+npm run runtime:build
 ```
 
-`wrangler dev` and `wrangler deploy` run `scripts/bundle.sh` first, which installs the PHP dependencies and packs the application into `dist/app.zip`.
+Running needs Node and the committed `runtime/dist/`; it does not need PHP or Composer. Building needs Docker (defaults to `~/.local/bin/docker`, override `CONTAINER_ENGINE`), network access and several minutes on the first run. `runtime/build.sh` pins the Emscripten image by digest, PHP 8.4.27 by SHA-256, Composer's image by digest and PHP dependencies by `composer.lock`. PCRE2, timelib and libmbfl come from the pinned PHP tarball; no external libraries are linked. Build tools use a dated Ubuntu package snapshot.
 
-`dist/app.zip` is committed, because Cloudflare's build machines have no Composer: there, `bundle.sh` uses the committed bundle as it is. **After changing the application, run `npm run bundle` and commit `dist/app.zip` with the change.**
-
-## Deploy
-
-From this machine:
-
-```sh
-npx wrangler login
-npm run deploy     # prints the *.workers.dev URL
-npx wrangler tail  # live logs
-```
-
-Or from the Cloudflare dashboard, deploying on every push: **Workers & Pages → Create → Import a repository**, pick this repository, name the project `crab-cf-worker` (the `name` in `wrangler.toml`), leave the build command empty and keep the deploy command `npx wrangler deploy`.
-
-The free plan allows 10 ms of CPU a request, which PHP's first request in an isolate exceeds; use the Workers Paid plan.
+**After changing PHP code or runtime sources, run `npm run runtime:build` and commit `runtime/dist/` with the change.** Cloudflare's build machines upload these committed artifacts; they do not run PHP, Composer or Emscripten. Build intermediates stay in ignored `runtime/.build/`.
 
 ## How it works
 
-- `src/worker.js` starts one PHP for each Worker isolate, unpacks `dist/app.zip` into PHP's filesystem and requires `worker.php`, which loads the application once.
-- Each request is written to `/tmp/request.json`; `crab_handle()` builds a `Crab\Http\Request`, calls `$app->handle()` and prints the response as JSON, which the Worker turns back into a `Response`. PHP answers one request at a time per isolate.
-- Crab's server, workers, queue, scheduler and WebSockets are not used: there are no processes or listening sockets in a Worker.
+- One PHP 8.4 embed SAPI per isolate, built with Emscripten 4.0.20 and genuine wasm64 pointers/integers. `PHP_INT_SIZE` is 8; the framework's Validator needs no patch.
+- Application and vendor files are compiled into the Wasm filesystem. No zip, extraction, Vrzno or PDO bridge.
+- `runtime/embed.c` starts PHP, requires `worker.php` once, then calls `crab_handle(method, target, headers, body)` with Zend values. A length-prefixed byte buffer carries requests and responses. No request file, JSON transport or base64.
+- Our ES-module adapter uses static Wasm imports. The generated Emscripten libc/MEMFS support is fixed to the Worker environment, with no Node detection. Compatibility date: 2026-11-19.
+- Requests are serialized, including boot and body reads. A failed interpreter is discarded.
+- Extensions verified by running the application: Core, standard, date, pcre, json, ctype, hash, random, SPL, Reflection, filter, tokenizer and native mbstring. No mbstring polyfill, sessions, PDO, zip or network extensions. mbstring regex support is omitted (no Oniguruma).
 
-## Limits found
+## Measurements
 
-- **32-bit PHP.** Integers stop at 2,147,483,647. The framework's `Validator` bounds whole numbers at 2^53 − 1, which does not fit, so `scripts/bundle.sh` patches the bundled copy to cap it at `PHP_INT_MAX`.
-- **No Arc.** The pages are plain PHP templates in `resources/views`, rendered by `App\Page`. Arc cannot compile a template here: it checks compiled code by starting `php -l`, and a Worker cannot start processes. Templates cannot be compiled ahead either: the cache key holds the exact PHP version (8.4.1 here) and the file's path. Using Arc would need a change in it, such as loading templates compiled at deploy time.
-- **No MySQL.** PHP cannot open sockets to a database; Cloudflare D1 is reachable through PDO's `cfd1` driver.
-- **Missing extensions.** No `mbstring` (the Symfony polyfill stands in), `sodium`, `openssl` or `iconv`; no OPcache.
-- **Compatibility date pinned to 2025-05-05.** Later dates give Workers a Node-style `process`, which the PHP runtime takes for Node and refuses to start in.
+Five fresh instances per route, medians in milliseconds on this Linux host. Node 24.11.1 uses a fresh process per sample; workerd 1.20261118.1 reuses its compiled module but creates a fresh PHP instance. Local workerd timers resolve to 1 ms. These are local elapsed times, not billing CPU; **live Workers clocks freeze during execution**.
+
+| Runtime / engine / route | Instantiate | PHP init | App boot | First | Tenth | Boot + first |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Old / Node / `/` | 44.9 | 32.7 | 221.7 | 40.2 | 1.43 | 294.7 |
+| Old / Node / `/api/products` | 45.3 | 32.7 | 222.1 | 37.5 | 0.85 | 293.7 |
+| New source / Node / `/` | 50.9 | 23.0 | 72.7 | 31.7 | 0.65 | 127.3 |
+| New source / Node / `/api/products` | 51.4 | 22.9 | 72.8 | 30.4 | 0.43 | 126.5 |
+| Old / workerd / `/` | 18 | 5 | 191 | 13 | 1 | 208 |
+| Old / workerd / `/api/products` | 17 | 4 | 179 | 11 | <1 | 194 |
+| New source / workerd / `/` | 37 | 3 | 24 | 6 | 1 | 33 |
+| New source / workerd / `/api/products` | 34 | 3 | 21 | 5 | 1 | 29 |
+
+Old Wasm: 11,505,886 bytes plus a 916,249-byte app zip; 64 MiB linear memory. New source build: about 8 MiB Wasm including the app; 32 MiB initial linear memory (96 MiB hard cap), 4 MiB peak PHP-managed memory during acceptance. More startup experiments are in progress; the target is below 50 ms including cold PHP boot plus first request.
+
+```sh
+# Node 24+ is required for wasm64 tables (Node 22 cannot compile them).
+node runtime/bench.mjs new node
+node runtime/bench.mjs new workerd
+sh runtime/prepare-legacy.sh  # optional isolated benchmark dependency, not production
+node runtime/bench.mjs old node
+node runtime/bench.mjs old workerd
+```
+
+Raw samples are in `runtime/results/`. The old adapter uses the exact old app zip from commit `ac41c805`; its Node loader bypasses only the package's environment guard. The first old workerd sample before V8 warmed up cost 455 ms boot + first. Previously measured live with `wrangler tail`: 450–1,073 ms CPU cold, about 3 ms warm. New live CPU has **not** been measured.
+
+## 64-bit probe
+
+Local workerd accepts both the memory64 probe and this complete wasm64 PHP runtime. A standalone live test is available; it uses its own Worker name and never reads the production configuration:
+
+```sh
+sh runtime/memory64-test.sh          # local probe
+sh runtime/memory64-test.sh deploy   # optional live probe, only when you choose
+```
+
+The live probe has not been deployed by this task. Node 22's experimental memory64 support lacks table64; use Node 24+ for local PHP tools.
+
+## Deploy and limits
+
+`npm run deploy` deploys the shop. A push may also deploy through Cloudflare's Git integration. This runtime task commits locally but **does not push or deploy**.
+
+- Use the Workers Paid plan; the 10 ms free CPU budget is too small for a cold PHP request.
+- No processes, network extensions, database connections, scheduler or server workers. Native Fiber stack switching is unavailable; starting a Fiber is unsupported. The synchronous application path does not start one.
+- No Arc: its compiler starts `php -l`; use the existing plain PHP templates. Arc would need an ahead-of-time artifact API with stable paths/version metadata.
+- Bodies are capped at 8 MiB at the embed ABI. This experiment is not a general-purpose PHP hosting environment.
+- A small php-src allocator patch replaces mmap/partial-munmap chunk alignment with aligned allocation. Emscripten cannot partially unmap allocations. Zend's allocator and PHP memory accounting remain active.
+- OPcache and initialized-memory snapshots are being evaluated separately; no claims of support until tested.

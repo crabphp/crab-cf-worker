@@ -1,31 +1,8 @@
 #!/bin/sh
-# Packs the application into dist/app.zip, which the Worker carries and unpacks into PHP's filesystem.
+# Cloudflare builds have no PHP or compiler. Upload the committed runtime image.
 set -eu
 cd "$(dirname "$0")/.."
-
-# Cloudflare's build machines have no Composer, so dist/app.zip is built here and committed;
-# there, the committed bundle is used as it is.
-if ! command -v composer >/dev/null 2>&1; then
-    if [ -f dist/app.zip ]; then
-        echo "No Composer: using the committed dist/app.zip. Run npm run bundle locally after a change."
-        exit 0
-    fi
-    echo "No Composer and no dist/app.zip: build the bundle locally with npm run bundle." >&2
+if [ ! -s runtime/dist/php.wasm ] || [ ! -s runtime/dist/php.mjs ]; then
+    echo 'Missing runtime. Run sh runtime/build.sh locally and commit runtime/dist/.' >&2
     exit 1
 fi
-
-composer install --no-dev --optimize-autoloader --quiet
-
-# The PHP this Worker runs is 32-bit, so its integers stop at 2,147,483,647. The framework's
-# Validator bounds whole numbers at 2^53 - 1, which does not fit and stops the class from loading.
-# Until the framework allows for 32-bit PHP, the bundled copy caps that bound at PHP_INT_MAX.
-validator=vendor/crabphp/framework/src/Validation/Validator.php
-sed 's/private const int SAFE = 9_007_199_254_740_991;/private const int SAFE = PHP_INT_SIZE >= 8 ? 9_007_199_254_740_991 : PHP_INT_MAX;/' \
-    "$validator" > "$validator.tmp" && mv "$validator.tmp" "$validator"
-grep -q 'PHP_INT_SIZE >= 8' "$validator" || { echo "The Validator patch no longer applies: check $validator." >&2; exit 1; }
-
-mkdir -p dist
-rm -f dist/app.zip
-zip -r -q -X dist/app.zip app app.php worker.php config resources routes vendor \
-    -x 'vendor/*/tests/*' 'vendor/*/docs/*' 'vendor/*/examples/*' 'vendor/*/.claude/*' 'vendor/*/.github/*' '*.md'
-echo "dist/app.zip: $(du -h dist/app.zip | cut -f1), $(unzip -Z1 dist/app.zip | grep -c '\.php$') PHP files"

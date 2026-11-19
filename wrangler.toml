@@ -1,15 +1,7 @@
 name = "crab-cf-worker"
 main = "src/worker.js"
-# Kept at this date on purpose: later dates give Workers a Node-style `process`, which the PHP runtime
-# takes for an environment it was not built for and refuses to start.
-compatibility_date = "2025-05-05"
-
-# The packed application, carried by the Worker as bytes.
-[[rules]]
-type = "Data"
-globs = ["**/*.zip"]
-fallthrough = true
+compatibility_date = "2026-11-19"
 
 [build]
 command = "sh scripts/bundle.sh"
-watch_dir = ["app", "config", "resources", "routes", "app.php", "worker.php"]
+watch_dir = ["runtime/dist"]

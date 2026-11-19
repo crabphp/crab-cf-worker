@@ -1,0 +1,21 @@
+{
+    "name": "crabphp/crab-cf-worker",
+    "description": "A Crab application running inside a Cloudflare Worker, on PHP compiled to WebAssembly",
+    "type": "project",
+    "require": {
+        "php": "^8.4",
+        "crabphp/framework": "^0.7.3",
+        "crabphp/arc": "^0.3",
+        "symfony/polyfill-mbstring": "^1.31"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "app/"
+        }
+    },
+    "config": {
+        "platform-check": false,
+        "optimize-autoloader": true
+    },
+    "prefer-stable": true
+}

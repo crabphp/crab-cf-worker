@@ -1,0 +1,16 @@
+{
+  "name": "crab-cf-worker",
+  "version": "1.0.0",
+  "description": "A Crab application inside a Cloudflare Worker, on PHP compiled to WebAssembly",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "bundle": "sh scripts/bundle.sh"
+  },
+  "type": "commonjs",
+  "devDependencies": {
+    "php-cloud-wasm": "0.2.0",
+    "wrangler": "4.165.0"
+  },
+  "private": true
+}

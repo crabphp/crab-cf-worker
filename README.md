@@ -16,6 +16,31 @@ An experiment: a [Crab](https://github.com/crabphp/framework) application inside
 
 Measured on Cloudflare with `wrangler tail`: a request that lands on a new isolate uses 0.5 to 1 s of CPU (starting PHP, unpacking and loading the application); one on a warm isolate uses about 3 ms. Most requests landed on new isolates.
 
+## Local runtime baseline
+
+`npm test` starts Wrangler, checks all ten shop/API cases, and stops it. The
+replacement-runtime task is in `runtime/BRIEF.md`. `runtime/memory64-test.sh`
+proves memory64 works in local workerd 1.20261118.1; `sh runtime/memory64-test.sh deploy`
+is an optional, separate live probe (not run automatically).
+
+Reproduce the old runtime baseline with `sh runtime/prepare-legacy.sh`, then
+`node runtime/bench.mjs old node` and `node runtime/bench.mjs old workerd`.
+Five fresh PHP instances per route; medians in milliseconds, on this Linux host:
+
+| Engine / route | Instantiate | PHP init | Unzip + app boot | First request | Tenth request | Boot + first |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Node 22 / `/` | 58.1 | 40.4 | 269.7 | 80.1 | 1.86 | 391.4 |
+| Node 22 / `/api/products` | 57.9 | 40.4 | 314.4 | 76.2 | 1.29 | 429.3 |
+| workerd / `/` | 18 | 5 | 191 | 13 | 1 | 208 |
+| workerd / `/api/products` | 17 | 4 | 179 | 11 | <1 | 194 |
+
+Raw samples: `runtime/results/old-*.json`. Node uses a fresh process per sample;
+workerd reuses the compiled module but creates a fresh PHP instance. Local
+workerd timers have 1 ms resolution; these are elapsed times, not billing CPU.
+The first workerd sample (before V8 warms up) was 455 ms boot + first request.
+Do not measure this with the frozen clock on live Workers. The old Wasm is
+11,505,886 bytes; its app zip is 916,249 bytes; linear memory is 64 MiB.
+
 ## Run
 
 Needs PHP 8.4 with Composer, Node 24, and `zip`.

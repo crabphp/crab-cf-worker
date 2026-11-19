@@ -5,3 +5,7 @@
 /storage/
 /.wrangler/
 .dev.vars
+/runtime/.cache/
+/runtime/.legacy/
+/runtime/.memory64-*/
+/runtime/.build/

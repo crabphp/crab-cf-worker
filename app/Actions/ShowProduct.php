@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Catalog;
+use App\Page;
 use Crab\Http\Response;
 
 /**
@@ -18,9 +19,9 @@ final readonly class ShowProduct
     {
         $product = $this->catalog->find($id);
         if ($product === null) {
-            return view('missing', status: 404);
+            return Page::render('missing', 'Not found', status: 404);
         }
 
-        return view('product', ['product' => $product]);
+        return Page::render('product', $product->name, ['product' => $product]);
     }
 }

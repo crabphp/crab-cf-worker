@@ -1,10 +1,10 @@
-@props(string $title, string $slot = '')
+<?php /** @var string $title @var string $body */ ?>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $title }}</title>
+    <title><?= e($title) ?></title>
     <style>
         :root { color-scheme: light dark; }
         body { font: 16px/1.5 system-ui, sans-serif; max-width: 42rem; margin: 3rem auto; padding: 0 1rem; }
@@ -22,6 +22,6 @@
         <a href="/">Crab on Workers</a>
         <span class="muted"><a href="/api/products">/api/products</a></span>
     </header>
-    <main>{!! $slot !!}</main>
+    <main><?= $body ?></main>
 </body>
 </html>

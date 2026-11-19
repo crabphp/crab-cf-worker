@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Catalog;
+use App\Page;
 use Crab\Http\Response;
 
 /**
- * The home page: every product, rendered by Arc.
+ * The home page: every product.
  */
 final readonly class ShowHome
 {
@@ -16,7 +17,7 @@ final readonly class ShowHome
 
     public function handle(): Response
     {
-        return view('home', [
+        return Page::render('home', 'Crab on Workers', [
             'products' => $this->catalog->all(),
             'php' => PHP_VERSION,
         ]);

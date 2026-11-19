@@ -36,10 +36,7 @@ async function start() {
 }
 
 async function handle(request) {
-  const started = Date.now();
-  const cold = php === null;
   php ??= await start();
-  const loaded = Date.now();
 
   const url = new URL(request.url);
   await php.writeFile('/tmp/request.json', JSON.stringify({
@@ -66,10 +63,6 @@ async function handle(request) {
       headers.append(name, value);
     }
   }
-  // How long this request spent loading PHP and the application (the first one only), and in Crab.
-  headers.set('x-crab-start-ms', cold ? String(loaded - started) : '0');
-  headers.set('x-crab-handle-ms', String(Date.now() - loaded));
-
   // A response without content, such as 204 or 304, must be given no body at all.
   const body = [101, 204, 205, 304].includes(answer.status) ? null : bytes(answer.body);
   return new Response(body, { status: answer.status, headers });

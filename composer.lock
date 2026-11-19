@@ -4,50 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cce3bc06bccf95e50354f9f8fa374bdd",
+    "content-hash": "f31737a8ad394d31c655c738ef58360d",
     "packages": [
-        {
-            "name": "crabphp/arc",
-            "version": "v0.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/crabphp/arc.git",
-                "reference": "adcf25f057e51e36ca4edb9a2c12bc17c91bc483"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/crabphp/arc/zipball/adcf25f057e51e36ca4edb9a2c12bc17c91bc483",
-                "reference": "adcf25f057e51e36ca4edb9a2c12bc17c91bc483",
-                "shasum": ""
-            },
-            "require": {
-                "crabphp/framework": "^0.7",
-                "php": "^8.4"
-            },
-            "require-dev": {
-                "carthage-software/mago": "1.57.0",
-                "phpunit/phpunit": "^13.4.4"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/helpers.php"
-                ],
-                "psr-4": {
-                    "Crab\\Arc\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "description": "Arc, the Crab template engine: components compiled once to plain PHP",
-            "support": {
-                "issues": "https://github.com/crabphp/arc/issues",
-                "source": "https://github.com/crabphp/arc/tree/v0.3.0"
-            },
-            "time": "2026-11-12T18:09:42+00:00"
-        },
         {
             "name": "crabphp/framework",
             "version": "v0.7.5",

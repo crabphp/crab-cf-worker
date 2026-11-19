@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "bundle": "sh scripts/bundle.sh"
+    "bundle": "sh scripts/bundle.sh",
+    "test": "node runtime/test.mjs"
   },
   "type": "commonjs",
   "devDependencies": {

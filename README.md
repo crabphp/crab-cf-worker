@@ -4,6 +4,21 @@ An experiment: a [Crab](https://github.com/crabphp/framework) shop inside a Clou
 
 > **Only an experiment.** Not supported, maintained or recommended for production. Crab is designed for its own long-lived server. The new runtime is much faster, but **Free's 10 ms request CPU budget is not demonstrated**; use Workers Paid pending live measurements.
 
+## Live results
+
+Live at <https://crab-cf-worker.daudau.workers.dev>, measured on 2026-11-19 on Workers Paid:
+
+- **CPU per request** (`wrangler tail`): 1–5 ms on a warm isolate; 20–150 ms on a new one, mostly V8 compiling the WebAssembly code a request first runs. Plain PHP (`/raw`) and Crab cost the same warm; Crab's first request on an isolate costs more, because it runs more of the engine.
+- **Load**: two minutes of mixed traffic, 128 requests in flight from one machine: 172,329 requests at 1,436 per second, p50 66 ms, p95 228 ms, no 500s.
+
+| Route | What it shows |
+| --- | --- |
+| `/`, `/products/{id}` | Pages, as plain PHP templates |
+| `/api/products`, `/api/products/{id}`, `POST /api/orders` | The JSON API, with validation |
+| `/debug` | The runtime, extensions, request headers, and this isolate's request count and memory |
+| `/debug/phpinfo` | `phpinfo()` |
+| `/raw`, `/raw/api/products` | The same products in plain PHP, without Crab, to compare |
+
 ## Run
 
 ```sh

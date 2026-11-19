@@ -2,6 +2,8 @@
 
 An experiment: a [Crab](https://github.com/crabphp/framework) application inside a Cloudflare Worker, on PHP 8.4 compiled to WebAssembly ([php-cloud-wasm](https://www.npmjs.com/package/php-cloud-wasm)). It is a pretend shop: two HTML pages and a small JSON API over products kept in code.
 
+> **This is only an experiment.** It is not supported, not maintained and not a way to run Crab in production. It exists to find out what works when Crab runs on PHP compiled to WebAssembly; the limits it found are listed below. Crab is built to run as its own long-lived server.
+
 ## Status
 
 | Route | Works |

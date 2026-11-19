@@ -5,3 +5,8 @@ compatibility_date = "2026-11-19"
 [build]
 command = "sh scripts/bundle.sh"
 watch_dir = ["runtime/dist"]
+
+# The free plan's CPU limit, enforced on a paid account too: a request that uses more than 10 ms fails,
+# so this Worker proves it runs on the free plan.
+[limits]
+cpu_ms = 10
